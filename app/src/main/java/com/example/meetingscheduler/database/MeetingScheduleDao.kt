@@ -10,10 +10,10 @@ import com.example.meetingscheduler.models.MeetingSchedule.Companion.TABLE_NAME
 @Dao
 interface MeetingScheduleDao {
     @Query("SELECT * FROM $TABLE_NAME")
-    suspend fun getAllMeetings() : List<MeetingSchedule>
+    suspend fun getAllMeetings(): List<MeetingSchedule>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE meetingDate = :date ORDER BY startTime asc")
-    suspend fun getMeetingsByDate(date : String) : List<MeetingSchedule>
+    suspend fun getMeetingsByDate(date: String): List<MeetingSchedule>
 
     @Insert
     suspend fun insertMeetings(vararg meetingSchedule: MeetingSchedule)
@@ -22,5 +22,12 @@ interface MeetingScheduleDao {
     suspend fun insertAll(vararg meetingSchedule: MeetingSchedule)
 
     @Delete
-    suspend fun delete(meetingSchedule : MeetingSchedule)
+    suspend fun delete(meetingSchedule: MeetingSchedule)
+
+    @Query("SELECT CASE WHEN EXISTS (SELECT * FROM $TABLE_NAME WHERE :targetEndTime <= startTime AND :targetStartTime >= endTime AND meetingDate = :targetDate) THEN 'true' ELSE 'false' END")
+    suspend fun isTimingOverlapping(
+        targetDate: String,
+        targetStartTime: String,
+        targetEndTime: String
+    ): String
 }

@@ -7,7 +7,7 @@
 
     <View
         android:id="@+id/vertical_divider"
-        android:layout_width="1dp"
+        android:layout_width="0.5dp"
         android:layout_height="0dp"
         android:background="@color/black"
         android:layout_marginTop="8dp"
@@ -20,7 +20,7 @@
     <View
         android:id="@+id/horizontal_divider"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="@color/black"
         app:layout_constraintTop_toBottomOf="@id/timing_start"
         app:layout_constraintBottom_toTopOf="@id/timing_end"
@@ -56,16 +56,18 @@
 
     <TextView
         android:id="@+id/description"
-        android:layout_width="500dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginEnd="30dp"
         android:maxLines="2"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/timing_start"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

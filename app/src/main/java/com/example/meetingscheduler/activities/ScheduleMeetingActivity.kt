@@ -6,28 +6,34 @@ import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
-import androidx.room.Room
 import com.example.meetingscheduler.coroutine.BaseActivity
 import com.example.meetingscheduler.R
-import com.example.meetingscheduler.activities.MeetingsActivity.Companion.currentDate
 import com.example.meetingscheduler.database.AppDatabase
-import com.example.meetingscheduler.database.MeetingScheduleDao
 import com.example.meetingscheduler.models.MeetingSchedule
+import kotlinx.android.synthetic.main.activity_meetings.*
 import kotlinx.android.synthetic.main.activity_schedule_meeting.*
-import kotlinx.android.synthetic.main.item_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
 import kotlinx.coroutines.launch
-import java.util.*
 
 class ScheduleMeetingActivity : BaseActivity() {
-    private lateinit var meetingScheduleDao: MeetingScheduleDao
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule_meeting)
+        launch {
+            baseContext?.let {
+                val result = AppDatabase(it).meetingScheduleDao()
+                    .isTimingOverlapping(
+                        meeting_date.text.toString().trim(),
+                        meeting_start_time.text.toString().trim(),
+                        meeting_end_time.text.toString().trim()
+                    )
+                Log.i("123", result)
+            }
+        }
 
-        meetingScheduleDao = AppDatabase(this).meetingScheduleDao()
         button_back.setOnClickListener {
             finish()
         }
@@ -44,13 +50,14 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
 
         button_submit_meeting.setOnClickListener {
+            validateAll()
             addMeeting()
         }
     }
 
     private fun showTimePickerDialog(textView: TextView) {
         val cal = Calendar.getInstance()
-        val timeSetListener = TimePickerDialog.OnTimeSetListener { timePicker, hour, minute ->
+        val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             cal.set(Calendar.HOUR_OF_DAY, hour)
             cal.set(Calendar.MINUTE, minute)
             textView.text = SimpleDateFormat("HH:mm aa").format(cal.time)
@@ -71,19 +78,27 @@ class ScheduleMeetingActivity : BaseActivity() {
         val calendarDay = c.get(Calendar.DAY_OF_MONTH)
         val datePickerDialog = DatePickerDialog(
             this,
-            DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+            DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                 textView.text = ("$dayOfMonth-${month + 1}-$year".trim())
             },
             calendarYear,
             calendarMonth,
             calendarDay
         )
-
+        datePickerDialog.datePicker.minDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
-    private fun validateInput() =
-        (validateDate() && validateStartTime() && validateEndTime() && validateDescription())
+    private fun validateInput(): Boolean {
+        val x = isSlotAvailable(
+            meeting_date.text.toString().trim(),
+            meeting_start_time.text.toString().trim(),
+            meeting_end_time.text.toString().trim()
+        )
+        Log.i("1234", "$x")
+        return (validateDate() && validateStartTime() && validateEndTime() && validateDescription() && validateTime() && x)
+    }
+
 
     private fun validateDate(): Boolean {
         return if (meeting_date.text.toString() == resources.getString(R.string.meeting_date_text)) {
@@ -117,12 +132,22 @@ class ScheduleMeetingActivity : BaseActivity() {
     }
 
     private fun validateDescription(): Boolean {
-        return if (description.text.toString().isBlank()) {
-            description.error = "Enter a proper description"
-            description.requestFocus()
+        return if (meeting_description.text.toString().trim().isEmpty()) {
+            meeting_description.error = "Enter a proper description"
+            meeting_description.requestFocus()
             false
         } else {
-            description.error = null
+            meeting_description.error = null
+            true
+        }
+    }
+
+    private fun validateTime(): Boolean {
+        return if (meeting_start_time.text.toString() >= meeting_end_time.text.toString()) {
+            Toast.makeText(this, "Meeting should end after it will start!", Toast.LENGTH_SHORT)
+                .show()
+            false
+        } else {
             true
         }
     }
@@ -134,21 +159,49 @@ class ScheduleMeetingActivity : BaseActivity() {
         validateDescription()
     }
 
-    private fun addMeeting() {
-        val meetingDate = meeting_date.text.toString()
-        val startTime = meeting_start_time.text.toString()
-        val endTime = meeting_end_time.text.toString()
-        val description = meeting_description.text.toString()
-        val meetingSchedule = MeetingSchedule(startTime, endTime, meetingDate, description)
+    private fun isSlotAvailable(
+        targetDate: String,
+        targetStartTime: String,
+        targetEndTime: String
+    ): Boolean {
+        var result = ""
         launch {
             baseContext?.let {
-                AppDatabase(it).meetingScheduleDao().insertMeetings(meetingSchedule)
-                Toast.makeText(this@ScheduleMeetingActivity, "Meeting added!", Toast.LENGTH_SHORT)
-                    .show()
+                result = AppDatabase(it).meetingScheduleDao()
+                    .isTimingOverlapping(targetDate, targetStartTime, targetEndTime)
             }
         }
-        val intent = Intent(this, MeetingsActivity::class.java)
-        startActivity(intent)
-        finish()
+        return if (result == "false") {
+            Toast.makeText(this, "This is slot is not available for this date", Toast.LENGTH_SHORT)
+                .show()
+            false
+        } else {
+            true
+        }
+
+    }
+
+    private fun addMeeting() {
+        if (validateInput()) {
+            val meetingDate = meeting_date.text.toString().trim()
+            val startTime = meeting_start_time.text.toString().trim()
+            val endTime = meeting_end_time.text.toString().trim()
+            val description = meeting_description.text.toString().trim()
+            val meetingSchedule = MeetingSchedule(startTime, endTime, meetingDate, description)
+            launch {
+                baseContext?.let {
+                    AppDatabase(it).meetingScheduleDao().insertMeetings(meetingSchedule)
+                    Toast.makeText(
+                        this@ScheduleMeetingActivity,
+                        "Meeting added!",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                }
+            }
+            val intent = Intent(this, MeetingsActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
     }
 }
