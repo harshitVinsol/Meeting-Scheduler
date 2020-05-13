@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Meeting Scheduler</string>
+    <string name="meeting_date_text">Meeting Date</string>
+    <string name="meeting_start_time_text">Start Time</string>
+    <string name="meeting_end_time_text">End Time</string>
+    <string name="description_text">Description</string>
 </resources>

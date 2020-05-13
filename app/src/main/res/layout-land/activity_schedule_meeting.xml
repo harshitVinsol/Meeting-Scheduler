@@ -16,57 +16,57 @@
 
     <TextView
         android:id="@+id/meeting_date"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/white_background"
         android:padding="15dp"
         android:text="@string/meeting_date_text"
+        app:layout_constraintEnd_toStartOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top_bar_schedule_meeting" />
+        app:layout_constraintTop_toBottomOf="@id/top_bar_schedule_meeting"
+        app:layout_constraintWidth_percent="0.45" />
 
     <TextView
         android:id="@+id/meeting_start_time"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/white_background"
         android:padding="15dp"
         android:text="@string/meeting_start_time_text"
+        app:layout_constraintEnd_toStartOf="@id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/meeting_date" />
+        app:layout_constraintTop_toBottomOf="@id/meeting_date"
+        app:layout_constraintWidth_percent="0.45" />
 
     <TextView
         android:id="@+id/meeting_end_time"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/white_background"
         android:padding="15dp"
         android:text="@string/meeting_end_time_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/meeting_start_time" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline2"
+        app:layout_constraintTop_toBottomOf="@id/meeting_date"
+        app:layout_constraintWidth_percent="0.45" />
 
     <EditText
         android:id="@+id/meeting_description"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="30dp"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/white_background"
         android:hint="@string/description_text"
         android:inputType="textMultiLine"
         android:padding="10dp"
-        android:textAlignment="inherit"
+        android:textAlignment="viewStart"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/meeting_end_time" />
+        app:layout_constraintTop_toBottomOf="@id/meeting_end_time"
+        app:layout_constraintWidth_percent="0.95" />
 
     <Button
         android:id="@+id/button_submit_meeting"
@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/green_background"
         android:text="SUBMIT"
         android:textColor="@color/white"
@@ -83,5 +83,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

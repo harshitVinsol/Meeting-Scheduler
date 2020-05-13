@@ -5,12 +5,11 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.meetingscheduler.coroutine.BaseActivity
 import com.example.meetingscheduler.R
-import com.example.meetingscheduler.activities.ScheduleMeetingActivity.Companion.ADDED_CODE
-import com.example.meetingscheduler.activities.ScheduleMeetingActivity.Companion.ADDED_MEETING
 import com.example.meetingscheduler.adapters.MeetingSchedulerAdapter
 import com.example.meetingscheduler.database.AppDatabase
 import com.example.meetingscheduler.database.MeetingScheduleDao
@@ -18,14 +17,11 @@ import com.example.meetingscheduler.models.MeetingSchedule
 import kotlinx.android.synthetic.main.activity_meetings.*
 import kotlinx.android.synthetic.main.top_bar_meeting_layout.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.processNextEventInCurrentThread
 import java.util.*
 
 class MeetingsActivity : BaseActivity() {
     private lateinit var viewManager: LinearLayoutManager
     private lateinit var meetingsAdapter: MeetingSchedulerAdapter
-    private lateinit var currentDate: String
-    private lateinit var topBarDate: String
     private lateinit var calendar: Calendar
     private lateinit var simpleDateFormat: SimpleDateFormat
     private lateinit var meetingScheduleDao: MeetingScheduleDao
@@ -42,6 +38,7 @@ class MeetingsActivity : BaseActivity() {
 
         meetingsAdapter = MeetingSchedulerAdapter(meetingList)
         meeting_recycler.adapter = meetingsAdapter
+        //meeting_recycler.hasFixedSize()
 
         button_schedule_meeting.setOnClickListener {
             val intent = Intent(this, ScheduleMeetingActivity::class.java)
@@ -118,11 +115,17 @@ class MeetingsActivity : BaseActivity() {
                 }
                 meetingsAdapter.setMeetingScheduleList(meetingList)
                 meeting_recycler.adapter = meetingsAdapter
+                checkIfListEmpty()
             }
         }
     }
 
+    private fun checkIfListEmpty(){
+        text_no_meetings.isVisible = meetingList.isEmpty()
+    }
     companion object{
         const val REQUEST_CODE = 100
+        internal lateinit var currentDate: String
+        internal lateinit var topBarDate: String
     }
 }
