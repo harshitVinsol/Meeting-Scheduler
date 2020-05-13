@@ -7,6 +7,9 @@ import androidx.room.Query
 import com.example.meetingscheduler.models.MeetingSchedule
 import com.example.meetingscheduler.models.MeetingSchedule.Companion.TABLE_NAME
 
+/*
+Meeting ScheduleDao that acts as a DAO between RoomDatabase and App Database
+ */
 @Dao
 interface MeetingScheduleDao {
     @Query("SELECT * FROM $TABLE_NAME")

@@ -25,6 +25,9 @@ class MeetingsActivity : BaseActivity() {
     private lateinit var topBarDate: String
     private var meetingList: List<MeetingSchedule> = listOf()
 
+    /*
+    This is Meeting Activity that opens up with current date at the top which can be changed to next or previous date on which list of meetings assigned to that day are loaded
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_meetings)
@@ -71,6 +74,9 @@ class MeetingsActivity : BaseActivity() {
         // outState.putParcelable(CALENDAR_REF, calendar)
     }
 
+    /*
+    A function to update current date and assign it to the topBarDate
+     */
     private fun todayDate() {
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         currentDate = topBarDate
@@ -79,6 +85,9 @@ class MeetingsActivity : BaseActivity() {
         enableButtonPrevious()
     }
 
+    /*
+    A function to assign a next date to topBarDate
+     */
     private fun nextDate() {
         calendar.add(Calendar.DATE, 1)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
@@ -87,6 +96,9 @@ class MeetingsActivity : BaseActivity() {
         enableButtonPrevious()
     }
 
+    /*
+    A function to assign a previous date to topBarDate
+     */
     private fun previousDate() {
         calendar.add(Calendar.DATE, -1)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
@@ -95,10 +107,16 @@ class MeetingsActivity : BaseActivity() {
         enableButtonPrevious()
     }
 
+    /*
+    A function to disable the previous button if the topBarDate is currentDate
+     */
     private fun enableButtonPrevious() {
         button_previous.isEnabled = topBarDate != currentDate
     }
 
+    /*
+    A function to load meetings for the date in function parameter and assign the adapter to the recycler view
+     */
     private fun getMeetingsForDate(date: String) {
         launch {
             baseContext?.let { letIt ->
@@ -110,6 +128,9 @@ class MeetingsActivity : BaseActivity() {
         }
     }
 
+    /*
+    A function to check if the list is empty and show text_no_meetings if true
+     */
     private fun checkIfListEmpty() {
         text_no_meetings.isVisible = meetingList.isEmpty()
     }

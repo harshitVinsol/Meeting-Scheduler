@@ -7,7 +7,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlin.coroutines.CoroutineContext
-
+/*
+This the BaseActivity() that every Activity must extend to enable Kotlin Coroutines
+ */
 abstract class BaseActivity : AppCompatActivity(), CoroutineScope {
     private lateinit var job: Job
 

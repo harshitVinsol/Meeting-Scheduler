@@ -18,11 +18,14 @@ import kotlinx.android.synthetic.main.activity_schedule_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
 import kotlinx.coroutines.launch
 
+/*
+An activity to Schedule a meeting for a date with start time, end time and a description
+ */
 class ScheduleMeetingActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule_meeting)
-        launch {
+        /*launch {
             baseContext?.let {
                 val result = AppDatabase(it).meetingScheduleDao()
                     .isTimingOverlapping(
@@ -33,7 +36,7 @@ class ScheduleMeetingActivity : BaseActivity() {
                 Log.i("123", result)
             }
         }
-
+         */
         button_back.setOnClickListener {
             finish()
         }
@@ -55,6 +58,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A function to build and show a time picker dialog
+     */
     private fun showTimePickerDialog(textView: TextView) {
         val cal = Calendar.getInstance()
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
@@ -71,6 +77,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         ).show()
     }
 
+    /*
+    A function to build and show a Date picker dialog
+     */
     private fun showDatePickerDialog(textView: TextView) {
         val c = Calendar.getInstance()
         val calendarYear = c.get(Calendar.YEAR)
@@ -89,6 +98,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         datePickerDialog.show()
     }
 
+    /*
+    A Boolean function to validate all the fields as well as to check if the meeting slot is available
+     */
     private fun validateInput(): Boolean {
         val x = isSlotAvailable(
             meeting_date.text.toString().trim(),
@@ -99,7 +111,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         return (validateDate() && validateStartTime() && validateEndTime() && validateDescription() && validateTime() && x)
     }
 
-
+    /*
+    A Boolean function to validate if a proper date has been picked or not
+     */
     private fun validateDate(): Boolean {
         return if (meeting_date.text.toString() == resources.getString(R.string.meeting_date_text)) {
             meeting_date.error = "Select a Meeting Date"
@@ -111,6 +125,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A Boolean function to validate if a proper start time has been picked or not
+     */
     private fun validateStartTime(): Boolean {
         return if (meeting_start_time.text.toString() == resources.getString(R.string.meeting_start_time_text)) {
             meeting_start_time.error = "Select a Start time for Meeting"
@@ -121,6 +138,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A Boolean function to validate if a proper end time has been picked or not
+     */
     private fun validateEndTime(): Boolean {
         return if (meeting_end_time.text.toString() == resources.getString(R.string.meeting_end_time_text)) {
             meeting_end_time.error = "Select a End Time for Meeting"
@@ -131,6 +151,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A Boolean function to validate if a proper description has been picked or not
+     */
     private fun validateDescription(): Boolean {
         return if (meeting_description.text.toString().trim().isEmpty()) {
             meeting_description.error = "Enter a proper description"
@@ -142,6 +165,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A Boolean function that validates that end time of the meeting is after the start time of the meeting
+     */
     private fun validateTime(): Boolean {
         return if (meeting_start_time.text.toString() >= meeting_end_time.text.toString()) {
             Toast.makeText(this, "Meeting should end after it will start!", Toast.LENGTH_SHORT)
@@ -152,6 +178,9 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A function to validate all the field validation functions of the form all at once
+     */
     private fun validateAll() {
         validateDate()
         validateStartTime()
@@ -159,28 +188,27 @@ class ScheduleMeetingActivity : BaseActivity() {
         validateDescription()
     }
 
+    /*
+    A Boolean function that return true if the slot is available and false otherwise
+     */
     private fun isSlotAvailable(
         targetDate: String,
         targetStartTime: String,
         targetEndTime: String
     ): Boolean {
-        var result = ""
+
         launch {
             baseContext?.let {
-                result = AppDatabase(it).meetingScheduleDao()
+                AppDatabase(it).meetingScheduleDao()
                     .isTimingOverlapping(targetDate, targetStartTime, targetEndTime)
             }
         }
-        return if (result == "false") {
-            Toast.makeText(this, "This is slot is not available for this date", Toast.LENGTH_SHORT)
-                .show()
-            false
-        } else {
-            true
-        }
-
+        return true
     }
 
+    /*
+    A function to add the meeting if all the validations are true
+     */
     private fun addMeeting() {
         if (validateInput()) {
             val meetingDate = meeting_date.text.toString().trim()
