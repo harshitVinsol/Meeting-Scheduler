@@ -21,6 +21,9 @@ class MeetingsActivity : BaseActivity() {
     private lateinit var meetingsAdapter: MeetingSchedulerAdapter
     private lateinit var calendar: Calendar
     private lateinit var simpleDateFormat: SimpleDateFormat
+    private lateinit var comparableSimpleDateFormat: SimpleDateFormat
+    private lateinit var comparableTopDate: String
+    private lateinit var comparableCurrentDate: String
     private lateinit var currentDate: String
     private lateinit var topBarDate: String
     private var meetingList: List<MeetingSchedule> = listOf()
@@ -40,13 +43,17 @@ class MeetingsActivity : BaseActivity() {
 
         calendar = Calendar.getInstance()
         simpleDateFormat = SimpleDateFormat("dd-M-yyyy")
+        comparableSimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
         if (savedInstanceState != null) {
             topBarDate = savedInstanceState.getString(TOP_BAR_DATE)!!
             currentDate = savedInstanceState.getString(CURRENT_DATE)!!
+            comparableTopDate = savedInstanceState.getString(COMPARABLE_TOP_DATE)!!
+            comparableCurrentDate = savedInstanceState.getString(COMPARABLE_CURRENT_DATE)!!
+            calendar = savedInstanceState.getSerializable(CALENDAR_REF)!! as Calendar
             top_date.text = topBarDate
             getMeetingsForDate(topBarDate.trim())
-            enableButtonPrevious()
+            disableScheduleCompanyMeetingButton()
         } else {
             todayDate()
         }
@@ -55,6 +62,7 @@ class MeetingsActivity : BaseActivity() {
 
         button_schedule_meeting.setOnClickListener {
             val intent = Intent(this, ScheduleMeetingActivity::class.java)
+            intent.putExtra(TOP_BAR_DATE, topBarDate)
             startActivity(intent)
         }
 
@@ -71,7 +79,9 @@ class MeetingsActivity : BaseActivity() {
         super.onSaveInstanceState(outState)
         outState.putString(TOP_BAR_DATE, topBarDate)
         outState.putString(CURRENT_DATE, currentDate)
-        // outState.putParcelable(CALENDAR_REF, calendar)
+        outState.putString(COMPARABLE_TOP_DATE, comparableTopDate)
+        outState.putString(COMPARABLE_CURRENT_DATE, comparableCurrentDate)
+        outState.putSerializable(CALENDAR_REF, calendar)
     }
 
     /*
@@ -79,10 +89,12 @@ class MeetingsActivity : BaseActivity() {
      */
     private fun todayDate() {
         topBarDate = simpleDateFormat.format(calendar.time).toString()
+        comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         currentDate = topBarDate
+        comparableCurrentDate = comparableTopDate
         top_date.text = topBarDate
         getMeetingsForDate(topBarDate.trim())
-        enableButtonPrevious()
+        disableScheduleCompanyMeetingButton()
     }
 
     /*
@@ -91,9 +103,10 @@ class MeetingsActivity : BaseActivity() {
     private fun nextDate() {
         calendar.add(Calendar.DATE, 1)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
+        comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         top_date.text = topBarDate
-        getMeetingsForDate(topBarDate.toString().trim())
-        enableButtonPrevious()
+        getMeetingsForDate(topBarDate.trim())
+        disableScheduleCompanyMeetingButton()
     }
 
     /*
@@ -102,16 +115,17 @@ class MeetingsActivity : BaseActivity() {
     private fun previousDate() {
         calendar.add(Calendar.DATE, -1)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
+        comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         top_date.text = topBarDate
-        getMeetingsForDate(topBarDate.toString().trim())
-        enableButtonPrevious()
+        getMeetingsForDate(topBarDate.trim())
+        disableScheduleCompanyMeetingButton()
     }
 
     /*
     A function to disable the previous button if the topBarDate is currentDate
      */
-    private fun enableButtonPrevious() {
-        button_previous.isEnabled = topBarDate != currentDate
+    private fun disableScheduleCompanyMeetingButton() {
+        button_schedule_meeting.isVisible = comparableTopDate >= comparableCurrentDate
     }
 
     /*
@@ -136,8 +150,10 @@ class MeetingsActivity : BaseActivity() {
     }
 
     companion object {
-        private const val TOP_BAR_DATE = "top_bar_date"
-        private const val CURRENT_DATE = "current_date"
+        internal const val TOP_BAR_DATE = "top_bar_date"
+        internal const val CURRENT_DATE = "current_date"
+        private const val COMPARABLE_TOP_DATE = "comparable_top_date"
+        private const val COMPARABLE_CURRENT_DATE ="comparable_current_date"
         private const val CALENDAR_REF = "calendar"
     }
 }

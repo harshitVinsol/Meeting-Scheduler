@@ -34,9 +34,9 @@ class MeetingSchedulerAdapter(private var meetingsList: List<MeetingSchedule>) :
 
     override fun onBindViewHolder(holder: MeetingSchedulerViewHolder, position: Int) {
         val meeting = meetingsList[position]
-        holder.startTime.text = meeting.startTime.toString()
-        holder.endTime.text = meeting.endTime.toString()
-        holder.description.text = meeting.description.toString()
+        holder.startTime.text = meeting.startTime.trim()
+        holder.endTime.text = meeting.endTime.trim()
+        holder.description.text = meeting.description.trim()
     }
 }
 

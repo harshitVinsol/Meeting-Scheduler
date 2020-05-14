@@ -5,14 +5,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.meetingscheduler.models.MeetingSchedule
-
+/*
+This abstract class working as the App Database for the App with @Database annotation having MeetingSchedule as an entity
+ */
 @Database(entities = [(MeetingSchedule::class)], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun meetingScheduleDao(): MeetingScheduleDao
 
     companion object {
         private const val NAME_OF_DATABASE = "meetingscheduledb"
-
+        /*
+        Function that builds and return an instance of Room database
+         */
         private fun buildDatabase(context: Context) = Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java,

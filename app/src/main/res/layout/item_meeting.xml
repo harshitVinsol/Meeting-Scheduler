@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
-        android:text="11:00 AM"
+        android:text="@string/dummy_start_time"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text=" - "
+        android:text="@string/time_divider"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/timing_start"
         app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="11:30 AM"
+        android:text="@string/dummy_end_time"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/separator"
         app:layout_constraintTop_toTopOf="parent" />

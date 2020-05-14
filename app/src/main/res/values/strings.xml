@@ -4,5 +4,23 @@
     <string name="meeting_start_time_text">Start Time</string>
     <string name="meeting_end_time_text">End Time</string>
     <string name="description_text">Description</string>
+    <string name="submit_text">SUBMIT</string>
     <string name="sample_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
+    <string name="meeting_date_error">Select a Meeting Date</string>
+    <string name="start_time_error">Select a Start time for Meeting</string>
+    <string name="end_time_error">Select a End time for Meeting</string>
+    <string name="meeting_description_error">Enter a proper description</string>
+    <string name="inappropriate_meeting_timings">Meeting should end after it will start!</string>
+    <string name="slot_not_available">This slot is not available for the day!</string>
+    <string name="meeting_added">Meeting added!</string>
+    <string name="text_no_meetings">No meetings scheduled for this day</string>
+    <string name="text_schedule_meeting">SCHEDULE A MEETING</string>
+    <string name="button_schedule_meeting">SCHEDULE COMPANY MEETING</string>
+    <string name="dummy_start_time">11:00 AM</string>
+    <string name="dummy_end_time">1:30 AM</string>
+    <string name="dummy_date">06-8-2015</string>
+    <string name="time_divider"> - </string>
+    <string name="text_prev">PREV</string>
+    <string name="text_next">NEXT</string>
+    <string name="text_back">BACK</string>
 </resources>

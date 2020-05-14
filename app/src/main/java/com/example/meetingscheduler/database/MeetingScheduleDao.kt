@@ -12,8 +12,6 @@ Meeting ScheduleDao that acts as a DAO between RoomDatabase and App Database
  */
 @Dao
 interface MeetingScheduleDao {
-    @Query("SELECT * FROM $TABLE_NAME")
-    suspend fun getAllMeetings(): List<MeetingSchedule>
 
     @Query("SELECT * FROM $TABLE_NAME WHERE meetingDate = :date ORDER BY startTime asc")
     suspend fun getMeetingsByDate(date: String): List<MeetingSchedule>
@@ -27,7 +25,7 @@ interface MeetingScheduleDao {
     @Delete
     suspend fun delete(meetingSchedule: MeetingSchedule)
 
-    @Query("SELECT CASE WHEN EXISTS (SELECT * FROM $TABLE_NAME WHERE :targetEndTime <= startTime AND :targetStartTime >= endTime AND meetingDate = :targetDate) THEN 'true' ELSE 'false' END")
+    @Query("SELECT CASE WHEN EXISTS (SELECT * FROM $TABLE_NAME WHERE :targetEndTime <= startTime AND :targetStartTime >= endTime AND meetingDate = :targetDate) THEN 'false' ELSE 'true' END")
     suspend fun isTimingOverlapping(
         targetDate: String,
         targetStartTime: String,

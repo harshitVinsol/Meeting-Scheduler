@@ -11,9 +11,9 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.meetingscheduler.coroutine.BaseActivity
 import com.example.meetingscheduler.R
+import com.example.meetingscheduler.activities.MeetingsActivity.Companion.TOP_BAR_DATE
 import com.example.meetingscheduler.database.AppDatabase
 import com.example.meetingscheduler.models.MeetingSchedule
-import kotlinx.android.synthetic.main.activity_meetings.*
 import kotlinx.android.synthetic.main.activity_schedule_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
 import kotlinx.coroutines.launch
@@ -37,6 +37,8 @@ class ScheduleMeetingActivity : BaseActivity() {
             }
         }
          */
+        val topBarDate = intent.getStringExtra(TOP_BAR_DATE)
+        meeting_date.text = topBarDate?.toString()?.trim()
         button_back.setOnClickListener {
             finish()
         }
@@ -116,8 +118,8 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun validateDate(): Boolean {
         return if (meeting_date.text.toString() == resources.getString(R.string.meeting_date_text)) {
-            meeting_date.error = "Select a Meeting Date"
-            Toast.makeText(this, "Select a Meeting Date", Toast.LENGTH_SHORT).show()
+            meeting_date.error = resources.getString(R.string.meeting_date_error)
+            Toast.makeText(this, R.string.meeting_date_error, Toast.LENGTH_SHORT).show()
             false
         } else {
             meeting_date.error = null
@@ -130,7 +132,7 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun validateStartTime(): Boolean {
         return if (meeting_start_time.text.toString() == resources.getString(R.string.meeting_start_time_text)) {
-            meeting_start_time.error = "Select a Start time for Meeting"
+            meeting_start_time.error = resources.getString(R.string.start_time_error)
             false
         } else {
             meeting_start_time.error = null
@@ -143,7 +145,7 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun validateEndTime(): Boolean {
         return if (meeting_end_time.text.toString() == resources.getString(R.string.meeting_end_time_text)) {
-            meeting_end_time.error = "Select a End Time for Meeting"
+            meeting_end_time.error = resources.getString(R.string.end_time_error)
             false
         } else {
             meeting_end_time.error = null
@@ -156,7 +158,7 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun validateDescription(): Boolean {
         return if (meeting_description.text.toString().trim().isEmpty()) {
-            meeting_description.error = "Enter a proper description"
+            meeting_description.error = resources.getString(R.string.meeting_description_error)
             meeting_description.requestFocus()
             false
         } else {
@@ -170,7 +172,7 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun validateTime(): Boolean {
         return if (meeting_start_time.text.toString() >= meeting_end_time.text.toString()) {
-            Toast.makeText(this, "Meeting should end after it will start!", Toast.LENGTH_SHORT)
+            Toast.makeText(this, R.string.inappropriate_meeting_timings, Toast.LENGTH_SHORT)
                 .show()
             false
         } else {
@@ -196,14 +198,20 @@ class ScheduleMeetingActivity : BaseActivity() {
         targetStartTime: String,
         targetEndTime: String
     ): Boolean {
-
-        launch {
+        var result = ""
+        val request = launch {
             baseContext?.let {
-                AppDatabase(it).meetingScheduleDao()
+                result = AppDatabase(it).meetingScheduleDao()
                     .isTimingOverlapping(targetDate, targetStartTime, targetEndTime)
             }
         }
-        return true
+        //request.join()
+        return if(result == "false"){
+            Toast.makeText(this, R.string.slot_not_available, Toast.LENGTH_SHORT).show()
+            false
+        }else{
+            true
+        }
     }
 
     /*
@@ -221,7 +229,7 @@ class ScheduleMeetingActivity : BaseActivity() {
                     AppDatabase(it).meetingScheduleDao().insertMeetings(meetingSchedule)
                     Toast.makeText(
                         this@ScheduleMeetingActivity,
-                        "Meeting added!",
+                        R.string.meeting_added,
                         Toast.LENGTH_SHORT
                     )
                         .show()
