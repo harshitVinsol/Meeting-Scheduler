@@ -152,8 +152,10 @@ class MeetingsActivity : BaseActivity() {
     companion object {
         internal const val TOP_BAR_DATE = "top_bar_date"
         internal const val CURRENT_DATE = "current_date"
+        internal const val REQUEST_CODE = 100
         private const val COMPARABLE_TOP_DATE = "comparable_top_date"
         private const val COMPARABLE_CURRENT_DATE ="comparable_current_date"
         private const val CALENDAR_REF = "calendar"
+
     }
 }

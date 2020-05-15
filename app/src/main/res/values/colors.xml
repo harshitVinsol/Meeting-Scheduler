@@ -6,5 +6,7 @@
     <color name="green">#2CB885</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
-    <string name="grey">#808885</string>
+    <color name="grey">#D8DDDB</color>
+    <color name="light_grey">#F1F2F2</color>
+    <color name="dark_grey">#959796 </color>
 </resources>

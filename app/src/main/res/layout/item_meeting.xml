@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/grey">
 
     <TextView
         android:id="@+id/timing_start"
@@ -34,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/time_divider"
+        android:text=" - "
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@id/timing_start"
         app:layout_constraintTop_toTopOf="parent" />

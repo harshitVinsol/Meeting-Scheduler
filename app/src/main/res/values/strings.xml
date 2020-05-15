@@ -18,7 +18,7 @@
     <string name="button_schedule_meeting">SCHEDULE COMPANY MEETING</string>
     <string name="dummy_start_time">11:00 AM</string>
     <string name="dummy_end_time">1:30 AM</string>
-    <string name="dummy_date">06-8-2015</string>
+    <string name="dummy_date">06–8–2015</string>
     <string name="time_divider"> - </string>
     <string name="text_prev">PREV</string>
     <string name="text_next">NEXT</string>
