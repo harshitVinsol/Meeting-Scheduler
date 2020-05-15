@@ -15,6 +15,7 @@
     <string name="meeting_added">Meeting added!</string>
     <string name="text_no_meetings">No meetings scheduled for this day</string>
     <string name="text_schedule_meeting">SCHEDULE A MEETING</string>
+    <string name="text_timings_overlap">Timings for your meeting is already taken!</string>
     <string name="button_schedule_meeting">SCHEDULE COMPANY MEETING</string>
     <string name="dummy_start_time">11:00 AM</string>
     <string name="dummy_end_time">1:30 AM</string>

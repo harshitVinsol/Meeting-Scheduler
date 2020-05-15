@@ -5,10 +5,7 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
-import android.os.AsyncTask
 import android.os.Bundle
-import android.provider.Contacts
-import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
@@ -20,9 +17,7 @@ import com.example.meetingscheduler.database.AppDatabase
 import com.example.meetingscheduler.models.MeetingSchedule
 import kotlinx.android.synthetic.main.activity_schedule_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /*
 An activity to Schedule a meeting for a date with start time, end time and a description
@@ -38,7 +33,7 @@ class ScheduleMeetingActivity : BaseActivity() {
         button_back.setOnClickListener {
             finish()
         }
-        
+
         meeting_date.setOnClickListener {
             showDatePickerDialog(meeting_date)
         }
@@ -55,6 +50,7 @@ class ScheduleMeetingActivity : BaseActivity() {
             validateAll()
             addMeeting()
         }
+
         meeting_description.setOnEditorActionListener { _, actionId, event ->
             if ((event != null && (event.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                 button_submit_meeting.performClick()
@@ -101,38 +97,44 @@ class ScheduleMeetingActivity : BaseActivity() {
         )
         datePickerDialog.datePicker.minDate = System.currentTimeMillis()
         datePickerDialog.show()
-
     }
 
     /*
     A Boolean function to validate all the fields as well as to check if the meeting slot is available
      */
     private fun validateInput(): Boolean {
-        var result = false
-        launch {
-            result = isSlotAvailable(
-                meeting_date.text.toString().trim(),
-                meeting_start_time.text.toString().trim(),
-                meeting_end_time.text.toString().trim()
-            )
-            Log.i("result", "$result")
-        }
-        return (validateDate() && validateStartTime() && validateEndTime() && validateDescription() && validateTime() && result)
+
+        return (validateDate() && validateStartTime() && validateEndTime() && validateDescription() && validateTime() && checkSlotAvailable())
     }
 
-    private suspend fun isSlotAvailable(
+    /*
+    A boolean validation function to check if the timing entered in the fields are available or not
+     */
+    private fun checkSlotAvailable(): Boolean {
+        val result = isSlotAvailable(
+            meeting_date.text.toString().trim(),
+            meeting_start_time.text.toString().trim(),
+            meeting_end_time.text.toString().trim()
+        )
+        if (!result) {
+            Toast.makeText(this, R.string.text_timings_overlap, Toast.LENGTH_SHORT)
+                .show()
+        }
+        return result
+    }
+
+    /*
+    A boolean function to call isTimingOverlapping query from the database
+     */
+    private fun isSlotAvailable(
         targetDate: String,
         targetStartTime: String,
         targetEndTime: String
     ): Boolean {
-        var x = false
-        val result = async {
-            baseContext?.let {
-                x = AppDatabase(it).meetingScheduleDao().isTimingOverlapping(targetDate, targetStartTime, targetEndTime)
-            }
+        return runBlocking {
+            AppDatabase(baseContext).meetingScheduleDao()
+                .isTimingOverlapping(targetDate, targetStartTime, targetEndTime)
         }
-        result.await()
-        return x
     }
 
     /*
@@ -238,25 +240,4 @@ class ScheduleMeetingActivity : BaseActivity() {
             finish()
         }
     }
-
 }
-/*
-var x = false
-        var resultFlag = false
-        class CheckSlot : AsyncTask<Void, Void, Void>() {
-            override fun doInBackground(vararg params: Void?): Void? {
-                x =AppDatabase(this@ScheduleMeetingActivity).meetingScheduleDao()
-                    .isTimingOverlapping(targetDate, targetStartTime, targetEndTime)
-                Log.i("x", "$x")
-                return null
-            }
-
-            override fun onPostExecute(result: Void?) {
-                super.onPostExecute(result)
-                resultFlag = x
-                Log.i("resultFlag", "$resultFlag")
-            }
-        }
-        CheckSlot().execute()
-        return resultFlag
- */

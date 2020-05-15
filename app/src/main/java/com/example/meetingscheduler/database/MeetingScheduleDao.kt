@@ -25,8 +25,8 @@ interface MeetingScheduleDao {
     @Delete
     suspend fun delete(meetingSchedule: MeetingSchedule)
 
-    @Query("SELECT CASE WHEN EXISTS (SELECT * FROM $TABLE_NAME WHERE :targetEndTime <= startTime AND :targetStartTime >= endTime AND meetingDate = :targetDate) THEN 0 ELSE 1 END")
-    fun isTimingOverlapping(
+    @Query("SELECT CASE WHEN EXISTS (SELECT * FROM meeting_schedules WHERE startTime <= :targetEndTime AND endTime >= :targetStartTime  AND meetingDate == :targetDate) THEN 0 ELSE 1 END")
+    suspend fun isTimingOverlapping(
         targetDate: String,
         targetStartTime: String,
         targetEndTime: String
