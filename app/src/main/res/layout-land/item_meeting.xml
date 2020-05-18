@@ -38,7 +38,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:text="@string/dummy_start_time"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,7 +50,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="10dp"
         android:text="@string/dummy_end_time"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timing_start" />
@@ -63,9 +63,10 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="10dp"
+        android:ellipsize="end"
         android:maxLines="2"
         android:text="@string/sample_text"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/timing_start"

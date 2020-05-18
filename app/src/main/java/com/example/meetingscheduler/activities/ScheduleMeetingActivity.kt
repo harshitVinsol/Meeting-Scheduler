@@ -40,22 +40,17 @@ class ScheduleMeetingActivity : BaseActivity() {
 
         meeting_start_time.setOnClickListener {
             showTimePickerDialog(meeting_start_time)
+            validateStartTime()
         }
 
         meeting_end_time.setOnClickListener {
             showTimePickerDialog(meeting_end_time)
+            validateEndTime()
         }
 
         button_submit_meeting.setOnClickListener {
             validateAll()
             addMeeting()
-        }
-
-        meeting_description.setOnEditorActionListener { _, actionId, event ->
-            if ((event != null && (event.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
-                button_submit_meeting.performClick()
-            }
-            false
         }
     }
 
@@ -67,7 +62,7 @@ class ScheduleMeetingActivity : BaseActivity() {
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             cal.set(Calendar.HOUR_OF_DAY, hour)
             cal.set(Calendar.MINUTE, minute)
-            textView.text = SimpleDateFormat("HH:mm aa").format(cal.time)
+            textView.text = SimpleDateFormat("HH:mm").format(cal.time)
         }
         TimePickerDialog(
             this,
@@ -103,7 +98,6 @@ class ScheduleMeetingActivity : BaseActivity() {
     A Boolean function to validate all the fields as well as to check if the meeting slot is available
      */
     private fun validateInput(): Boolean {
-
         return (validateDate() && validateStartTime() && validateEndTime() && validateDescription() && validateTime() && checkSlotAvailable())
     }
 
