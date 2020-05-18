@@ -40,12 +40,10 @@ class ScheduleMeetingActivity : BaseActivity() {
 
         meeting_start_time.setOnClickListener {
             showTimePickerDialog(meeting_start_time)
-            validateStartTime()
         }
 
         meeting_end_time.setOnClickListener {
             showTimePickerDialog(meeting_end_time)
-            validateEndTime()
         }
 
         button_submit_meeting.setOnClickListener {
