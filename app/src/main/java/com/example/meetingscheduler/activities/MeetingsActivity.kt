@@ -2,7 +2,9 @@ package com.example.meetingscheduler.activities
 
 import android.content.Intent
 import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.os.Bundle
+import android.util.Log
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,6 +16,7 @@ import com.example.meetingscheduler.models.MeetingSchedule
 import kotlinx.android.synthetic.main.activity_meetings.*
 import kotlinx.android.synthetic.main.top_bar_meeting_layout.*
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import java.util.*
 
 class MeetingsActivity : BaseActivity() {
@@ -26,6 +29,7 @@ class MeetingsActivity : BaseActivity() {
     private lateinit var comparableCurrentDate: String
     private lateinit var currentDate: String
     private lateinit var topBarDate: String
+    private lateinit var formattedTopBarDate: Date
     private var meetingList: List<MeetingSchedule> = listOf()
 
     /*
@@ -52,7 +56,7 @@ class MeetingsActivity : BaseActivity() {
             comparableCurrentDate = savedInstanceState.getString(COMPARABLE_CURRENT_DATE)!!
             calendar = savedInstanceState.getSerializable(CALENDAR_REF)!! as Calendar
             top_date.text = topBarDate
-            getMeetingsForDate(topBarDate.trim())
+            getMeetingsForDate(formattedTopBarDate)
             disableScheduleCompanyMeetingButton()
         } else {
             todayDate()
@@ -63,6 +67,8 @@ class MeetingsActivity : BaseActivity() {
         button_schedule_meeting.setOnClickListener {
             val intent = Intent(this, ScheduleMeetingActivity::class.java)
             intent.putExtra(TOP_BAR_DATE, topBarDate)
+            formattedTopBarDate as Serializable
+            intent.putExtra(FORMATTED_TOP_BAR_DATE, formattedTopBarDate)
             startActivity(intent)
         }
 
@@ -88,12 +94,13 @@ class MeetingsActivity : BaseActivity() {
     A function to update current date and assign it to the topBarDate
      */
     private fun todayDate() {
+        formattedTopBarDate = Date(calendar.timeInMillis)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         currentDate = topBarDate
         comparableCurrentDate = comparableTopDate
         top_date.text = topBarDate
-        getMeetingsForDate(topBarDate.trim())
+        getMeetingsForDate(formattedTopBarDate)
         disableScheduleCompanyMeetingButton()
     }
 
@@ -102,10 +109,11 @@ class MeetingsActivity : BaseActivity() {
      */
     private fun nextDate() {
         calendar.add(Calendar.DATE, 1)
+        formattedTopBarDate = Date(calendar.timeInMillis)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         top_date.text = topBarDate
-        getMeetingsForDate(topBarDate.trim())
+        getMeetingsForDate(formattedTopBarDate)
         disableScheduleCompanyMeetingButton()
     }
 
@@ -114,10 +122,11 @@ class MeetingsActivity : BaseActivity() {
      */
     private fun previousDate() {
         calendar.add(Calendar.DATE, -1)
+        formattedTopBarDate = Date(calendar.timeInMillis)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         top_date.text = topBarDate
-        getMeetingsForDate(topBarDate.trim())
+        getMeetingsForDate(formattedTopBarDate)
         disableScheduleCompanyMeetingButton()
     }
 
@@ -131,10 +140,14 @@ class MeetingsActivity : BaseActivity() {
     /*
     A function to load meetings for the date in function parameter and assign the adapter to the recycler view
      */
-    private fun getMeetingsForDate(date: String) {
+    private fun getMeetingsForDate(date: Date) {
         launch {
             baseContext?.let { letIt ->
-                meetingList = AppDatabase(letIt).meetingScheduleDao().getMeetingsByDate(date)
+                meetingList =
+                    AppDatabase(letIt).meetingScheduleDao().getMeetingsByDate(date)
+                meetingList.forEach {
+                    Log.i("@harsh", "${it.meetingDate} ${it.startTime} ${it.endTime}")
+                }
                 meetingsAdapter.setMeetingScheduleList(meetingList)
                 meeting_recycler.adapter = meetingsAdapter
                 checkIfListEmpty()
@@ -151,6 +164,7 @@ class MeetingsActivity : BaseActivity() {
 
     companion object {
         internal const val TOP_BAR_DATE = "top_bar_date"
+        internal const val FORMATTED_TOP_BAR_DATE = "formatted_top_bar_date"
         internal const val CURRENT_DATE = "current_date"
         private const val COMPARABLE_TOP_DATE = "comparable_top_date"
         private const val COMPARABLE_CURRENT_DATE = "comparable_current_date"

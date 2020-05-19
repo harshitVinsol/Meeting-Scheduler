@@ -6,29 +6,32 @@ import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.Toast
 import com.example.meetingscheduler.coroutine.BaseActivity
 import com.example.meetingscheduler.R
+import com.example.meetingscheduler.activities.MeetingsActivity.Companion.FORMATTED_TOP_BAR_DATE
 import com.example.meetingscheduler.activities.MeetingsActivity.Companion.TOP_BAR_DATE
 import com.example.meetingscheduler.database.AppDatabase
 import com.example.meetingscheduler.models.MeetingSchedule
 import kotlinx.android.synthetic.main.activity_schedule_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
 import kotlinx.coroutines.*
+import java.util.*
 
 /*
 An activity to Schedule a meeting for a date with start time, end time and a description
 */
 class ScheduleMeetingActivity : BaseActivity() {
+    private var formattedDate = Date(Calendar.getInstance().timeInMillis)
+    private var formattedStartTime = Date(Calendar.getInstance().timeInMillis)
+    private var formattedEndTime = Date(Calendar.getInstance().timeInMillis)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule_meeting)
 
-        val topBarDate = intent.getStringExtra(TOP_BAR_DATE)
-        meeting_date.text = topBarDate?.toString()?.trim()
+        formattedDate = intent.getSerializableExtra(FORMATTED_TOP_BAR_DATE) as Date
+        meeting_date.text = "${formattedDate.date}-${formattedDate.month+1}-${formattedDate.year+1900}"
 
         button_back.setOnClickListener {
             finish()
@@ -39,11 +42,11 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
 
         meeting_start_time.setOnClickListener {
-            showTimePickerDialog(meeting_start_time)
+            formattedStartTime = showTimePickerDialog(meeting_start_time)
         }
 
         meeting_end_time.setOnClickListener {
-            showTimePickerDialog(meeting_end_time)
+            formattedEndTime = showTimePickerDialog(meeting_end_time)
         }
 
         button_submit_meeting.setOnClickListener {
@@ -55,11 +58,13 @@ class ScheduleMeetingActivity : BaseActivity() {
     /*
     A function to build and show a time picker dialog
      */
-    private fun showTimePickerDialog(textView: TextView) {
+    private fun showTimePickerDialog(textView: TextView): Date {
         val cal = Calendar.getInstance()
+        var formattedTime = Date(cal.timeInMillis)
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             cal.set(Calendar.HOUR_OF_DAY, hour)
             cal.set(Calendar.MINUTE, minute)
+            formattedTime = Date(cal.timeInMillis)
             textView.text = SimpleDateFormat("HH:mm").format(cal.time)
         }
         TimePickerDialog(
@@ -69,6 +74,7 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal.get(Calendar.MINUTE),
             true
         ).show()
+        return formattedTime
     }
 
     /*
@@ -82,7 +88,11 @@ class ScheduleMeetingActivity : BaseActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                textView.text = ("$dayOfMonth-${month + 1}-$year".trim())
+                c[Calendar.YEAR] = year
+                c[Calendar.MONTH] = month
+                c[Calendar.DATE] = dayOfMonth
+                formattedDate = Date(c.timeInMillis)
+                textView.text = "$dayOfMonth-${month+1}-$year"
             },
             calendarYear,
             calendarMonth,
@@ -104,9 +114,9 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun checkSlotAvailable(): Boolean {
         val result = isSlotAvailable(
-            meeting_date.text.toString().trim(),
-            meeting_start_time.text.toString().trim(),
-            meeting_end_time.text.toString().trim()
+            formattedDate,
+            formattedStartTime,
+            formattedEndTime
         )
         if (!result) {
             Toast.makeText(this, R.string.text_timings_overlap, Toast.LENGTH_SHORT)
@@ -119,9 +129,9 @@ class ScheduleMeetingActivity : BaseActivity() {
     A boolean function to call isTimingOverlapping query from the database
      */
     private fun isSlotAvailable(
-        targetDate: String,
-        targetStartTime: String,
-        targetEndTime: String
+        targetDate: Date,
+        targetStartTime: Date,
+        targetEndTime: Date
     ): Boolean {
         return runBlocking {
             AppDatabase(baseContext).meetingScheduleDao()
@@ -211,11 +221,8 @@ class ScheduleMeetingActivity : BaseActivity() {
      */
     private fun addMeeting() {
         if (validateInput()) {
-            val meetingDate = meeting_date.text.toString().trim()
-            val startTime = meeting_start_time.text.toString().trim()
-            val endTime = meeting_end_time.text.toString().trim()
             val description = meeting_description.text.toString().trim()
-            val meetingSchedule = MeetingSchedule(startTime, endTime, meetingDate, description)
+            val meetingSchedule = MeetingSchedule(formattedStartTime, formattedEndTime, formattedDate, description)
             launch {
                 baseContext?.let {
                     AppDatabase(it).meetingScheduleDao().insertMeetings(meetingSchedule)

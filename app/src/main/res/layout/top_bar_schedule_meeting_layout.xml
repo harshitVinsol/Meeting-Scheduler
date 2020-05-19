@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:background="@color/green"
         android:drawableStart="@drawable/ic_previous_white_24dp"
+        android:stateListAnimator="@null"
         android:text="@string/text_back"
         android:textColor="@color/white"
         android:textSize="18sp"
