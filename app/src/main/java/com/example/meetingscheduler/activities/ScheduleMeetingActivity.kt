@@ -6,20 +6,17 @@ import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import com.example.meetingscheduler.coroutine.BaseActivity
 import com.example.meetingscheduler.R
 import com.example.meetingscheduler.activities.MeetingsActivity.Companion.FORMATTED_TOP_BAR_DATE
-import com.example.meetingscheduler.activities.MeetingsActivity.Companion.TOP_BAR_DATE
 import com.example.meetingscheduler.database.AppDatabase
 import com.example.meetingscheduler.models.MeetingSchedule
 import kotlinx.android.synthetic.main.activity_schedule_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
 import kotlinx.coroutines.*
 import java.util.*
-import kotlin.math.min
 
 /*
 An activity to Schedule a meeting for a date with start time, end time and a description
@@ -58,41 +55,47 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
+    /*
+    A function to build and show a time picker dialog for endTime
+     */
     private fun showEndTimePickerDialog() {
         val cal = Calendar.getInstance()
+        cal.clear()
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             cal[Calendar.HOUR_OF_DAY] = hour
             cal[Calendar.MINUTE] = minute
             formattedEndTime = Date(cal.timeInMillis)
-            meeting_end_time.text = SimpleDateFormat("HH:mm").format(cal.time)
+            meeting_end_time.text = SimpleDateFormat("hh:mm aa").format(cal.time)
         }
         TimePickerDialog(
             this,
             timeSetListener,
             cal.get(Calendar.HOUR_OF_DAY),
             cal.get(Calendar.MINUTE),
-            true
+            false
         ).show()
     }
 
     /*
-    A function to build and show a time picker dialog
+    A function to build and show a time picker dialog for startTime
      */
     private fun showStartTimePickerDialog() {
         val cal = Calendar.getInstance()
+        cal.clear()
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             cal[Calendar.HOUR_OF_DAY] = hour
             cal[Calendar.MINUTE] = minute
             formattedStartTime = Date(cal.timeInMillis)
-            meeting_start_time.text = SimpleDateFormat("HH:mm").format(cal.time)
+            meeting_start_time.text = SimpleDateFormat("hh:mm aa").format(cal.time)
         }
         TimePickerDialog(
             this,
             timeSetListener,
             cal.get(Calendar.HOUR_OF_DAY),
             cal.get(Calendar.MINUTE),
-            true
+            false
         ).show()
+
     }
 
     /*
