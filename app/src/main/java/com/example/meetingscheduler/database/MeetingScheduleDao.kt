@@ -14,7 +14,7 @@ Meeting ScheduleDao that acts as a DAO between RoomDatabase and App Database
 @Dao
 interface MeetingScheduleDao {
 
-    @Query("SELECT * FROM $TABLE_NAME WHERE meetingDate = :date ORDER BY startTime asc")
+    @Query("SELECT * FROM $TABLE_NAME WHERE meetingDate == :date ORDER BY startTime asc")
     suspend fun getMeetingsByDate(date: Date): List<MeetingSchedule>
 
     @Insert

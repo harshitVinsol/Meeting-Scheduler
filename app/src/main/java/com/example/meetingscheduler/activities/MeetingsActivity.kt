@@ -17,19 +17,21 @@ import kotlinx.android.synthetic.main.activity_meetings.*
 import kotlinx.android.synthetic.main.top_bar_meeting_layout.*
 import kotlinx.coroutines.launch
 import java.io.Serializable
+import java.time.Year
 import java.util.*
 
 class MeetingsActivity : BaseActivity() {
     private lateinit var viewManager: LinearLayoutManager
     private lateinit var meetingsAdapter: MeetingSchedulerAdapter
     private lateinit var calendar: Calendar
+    private lateinit var formattedCalendar: Calendar
     private lateinit var simpleDateFormat: SimpleDateFormat
     private lateinit var comparableSimpleDateFormat: SimpleDateFormat
     private lateinit var comparableTopDate: String
     private lateinit var comparableCurrentDate: String
     private lateinit var currentDate: String
-    private lateinit var topBarDate: String
-    private lateinit var formattedTopBarDate: Date
+    private var topBarDate: String = ""
+    private var formattedTopBarDate: Date = Date()
     private var meetingList: List<MeetingSchedule> = listOf()
 
     /*
@@ -46,6 +48,7 @@ class MeetingsActivity : BaseActivity() {
         meeting_recycler.addItemDecoration(dividerItemDecoration)
 
         calendar = Calendar.getInstance()
+        formattedCalendar = Calendar.getInstance()
         simpleDateFormat = SimpleDateFormat("dd-M-yyyy")
         comparableSimpleDateFormat = SimpleDateFormat("yyyy-MM-dd")
 
@@ -54,7 +57,10 @@ class MeetingsActivity : BaseActivity() {
             currentDate = savedInstanceState.getString(CURRENT_DATE)!!
             comparableTopDate = savedInstanceState.getString(COMPARABLE_TOP_DATE)!!
             comparableCurrentDate = savedInstanceState.getString(COMPARABLE_CURRENT_DATE)!!
-            calendar = savedInstanceState.getSerializable(CALENDAR_REF)!! as Calendar
+            calendar = savedInstanceState.getSerializable(CALENDAR_REF) as Calendar
+            formattedTopBarDate = savedInstanceState.getSerializable(FORMATTED_TOP_BAR_DATE) as Date
+            formattedCalendar =
+                savedInstanceState.getSerializable(FORMATTED_CALENDAR_REF) as Calendar
             top_date.text = topBarDate
             getMeetingsForDate(formattedTopBarDate)
             disableScheduleCompanyMeetingButton()
@@ -88,13 +94,16 @@ class MeetingsActivity : BaseActivity() {
         outState.putString(COMPARABLE_TOP_DATE, comparableTopDate)
         outState.putString(COMPARABLE_CURRENT_DATE, comparableCurrentDate)
         outState.putSerializable(CALENDAR_REF, calendar)
+        outState.putSerializable(FORMATTED_TOP_BAR_DATE, formattedTopBarDate)
+        outState.putSerializable(FORMATTED_CALENDAR_REF, formattedCalendar)
     }
 
     /*
     A function to update current date and assign it to the topBarDate
      */
     private fun todayDate() {
-        formattedTopBarDate = Date(calendar.timeInMillis)
+        calendarInDateFormat(calendar)
+        formattedTopBarDate = Date(formattedCalendar.timeInMillis)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         currentDate = topBarDate
@@ -109,7 +118,8 @@ class MeetingsActivity : BaseActivity() {
      */
     private fun nextDate() {
         calendar.add(Calendar.DATE, 1)
-        formattedTopBarDate = Date(calendar.timeInMillis)
+        calendarInDateFormat(calendar)
+        formattedTopBarDate = Date(formattedCalendar.timeInMillis)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         top_date.text = topBarDate
@@ -122,7 +132,8 @@ class MeetingsActivity : BaseActivity() {
      */
     private fun previousDate() {
         calendar.add(Calendar.DATE, -1)
-        formattedTopBarDate = Date(calendar.timeInMillis)
+        calendarInDateFormat(calendar)
+        formattedTopBarDate = Date(formattedCalendar.timeInMillis)
         topBarDate = simpleDateFormat.format(calendar.time).toString()
         comparableTopDate = comparableSimpleDateFormat.format(calendar.time).toString()
         top_date.text = topBarDate
@@ -145,9 +156,6 @@ class MeetingsActivity : BaseActivity() {
             baseContext?.let { letIt ->
                 meetingList =
                     AppDatabase(letIt).meetingScheduleDao().getMeetingsByDate(date)
-                meetingList.forEach {
-                    Log.i("@harsh", "${it.meetingDate} ${it.startTime} ${it.endTime}")
-                }
                 meetingsAdapter.setMeetingScheduleList(meetingList)
                 meeting_recycler.adapter = meetingsAdapter
                 checkIfListEmpty()
@@ -162,6 +170,16 @@ class MeetingsActivity : BaseActivity() {
         text_no_meetings.isVisible = meetingList.isEmpty()
     }
 
+    /*
+    A function to format the Calendar with only Date related information
+     */
+    private fun calendarInDateFormat(cal: Calendar) {
+        formattedCalendar.clear()
+        formattedCalendar[Calendar.YEAR] = cal[Calendar.YEAR]
+        formattedCalendar[Calendar.MONTH] = cal[Calendar.MONTH]
+        formattedCalendar[Calendar.DATE] = cal[Calendar.DATE]
+    }
+
     companion object {
         internal const val TOP_BAR_DATE = "top_bar_date"
         internal const val FORMATTED_TOP_BAR_DATE = "formatted_top_bar_date"
@@ -169,5 +187,6 @@ class MeetingsActivity : BaseActivity() {
         private const val COMPARABLE_TOP_DATE = "comparable_top_date"
         private const val COMPARABLE_CURRENT_DATE = "comparable_current_date"
         private const val CALENDAR_REF = "calendar"
+        private const val FORMATTED_CALENDAR_REF = "formatted_cal"
     }
 }

@@ -1,5 +1,6 @@
 package com.example.meetingscheduler.adapters
 
+import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,8 +35,8 @@ class MeetingSchedulerAdapter(private var meetingsList: List<MeetingSchedule>) :
 
     override fun onBindViewHolder(holder: MeetingSchedulerViewHolder, position: Int) {
         val meeting = meetingsList[position]
-        holder.startTime.text = "${meeting.startTime?.hours}:${meeting.startTime?.minutes}"
-        holder.endTime.text = "${meeting.endTime?.hours}:${meeting.endTime?.minutes}"
+        holder.startTime.text = SimpleDateFormat("HH:mm").format(meeting.startTime?.time)
+        holder.endTime.text = SimpleDateFormat("HH:mm").format(meeting.endTime?.time)
         holder.description.text = meeting.description.trim()
     }
 }

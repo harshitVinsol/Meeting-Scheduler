@@ -6,6 +6,7 @@ import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import com.example.meetingscheduler.coroutine.BaseActivity
@@ -18,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_schedule_meeting.*
 import kotlinx.android.synthetic.main.top_bar_schedule_meeting_layout.*
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.math.min
 
 /*
 An activity to Schedule a meeting for a date with start time, end time and a description
@@ -31,7 +33,8 @@ class ScheduleMeetingActivity : BaseActivity() {
         setContentView(R.layout.activity_schedule_meeting)
 
         formattedDate = intent.getSerializableExtra(FORMATTED_TOP_BAR_DATE) as Date
-        meeting_date.text = "${formattedDate.date}-${formattedDate.month+1}-${formattedDate.year+1900}"
+        meeting_date.text =
+            "${formattedDate.date}-${formattedDate.month + 1}-${formattedDate.year + 1900}"
 
         button_back.setOnClickListener {
             finish()
@@ -42,11 +45,11 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
 
         meeting_start_time.setOnClickListener {
-            formattedStartTime = showTimePickerDialog(meeting_start_time)
+            showStartTimePickerDialog()
         }
 
         meeting_end_time.setOnClickListener {
-            formattedEndTime = showTimePickerDialog(meeting_end_time)
+            showEndTimePickerDialog()
         }
 
         button_submit_meeting.setOnClickListener {
@@ -55,17 +58,13 @@ class ScheduleMeetingActivity : BaseActivity() {
         }
     }
 
-    /*
-    A function to build and show a time picker dialog
-     */
-    private fun showTimePickerDialog(textView: TextView): Date {
+    private fun showEndTimePickerDialog() {
         val cal = Calendar.getInstance()
-        var formattedTime = Date(cal.timeInMillis)
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-            cal.set(Calendar.HOUR_OF_DAY, hour)
-            cal.set(Calendar.MINUTE, minute)
-            formattedTime = Date(cal.timeInMillis)
-            textView.text = SimpleDateFormat("HH:mm").format(cal.time)
+            cal[Calendar.HOUR_OF_DAY] = hour
+            cal[Calendar.MINUTE] = minute
+            formattedEndTime = Date(cal.timeInMillis)
+            meeting_end_time.text = SimpleDateFormat("HH:mm").format(cal.time)
         }
         TimePickerDialog(
             this,
@@ -74,7 +73,26 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal.get(Calendar.MINUTE),
             true
         ).show()
-        return formattedTime
+    }
+
+    /*
+    A function to build and show a time picker dialog
+     */
+    private fun showStartTimePickerDialog() {
+        val cal = Calendar.getInstance()
+        val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
+            cal[Calendar.HOUR_OF_DAY] = hour
+            cal[Calendar.MINUTE] = minute
+            formattedStartTime = Date(cal.timeInMillis)
+            meeting_start_time.text = SimpleDateFormat("HH:mm").format(cal.time)
+        }
+        TimePickerDialog(
+            this,
+            timeSetListener,
+            cal.get(Calendar.HOUR_OF_DAY),
+            cal.get(Calendar.MINUTE),
+            true
+        ).show()
     }
 
     /*
@@ -88,11 +106,13 @@ class ScheduleMeetingActivity : BaseActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
-                c[Calendar.YEAR] = year
-                c[Calendar.MONTH] = month
-                c[Calendar.DATE] = dayOfMonth
-                formattedDate = Date(c.timeInMillis)
-                textView.text = "$dayOfMonth-${month+1}-$year"
+                val calendar = Calendar.getInstance()
+                calendar.clear()
+                calendar[Calendar.YEAR] = year
+                calendar[Calendar.MONTH] = month
+                calendar[Calendar.DATE] = dayOfMonth
+                formattedDate = Date(calendar.timeInMillis)
+                textView.text = "$dayOfMonth-${month + 1}-$year"
             },
             calendarYear,
             calendarMonth,
@@ -222,7 +242,8 @@ class ScheduleMeetingActivity : BaseActivity() {
     private fun addMeeting() {
         if (validateInput()) {
             val description = meeting_description.text.toString().trim()
-            val meetingSchedule = MeetingSchedule(formattedStartTime, formattedEndTime, formattedDate, description)
+            val meetingSchedule =
+                MeetingSchedule(formattedStartTime, formattedEndTime, formattedDate, description)
             launch {
                 baseContext?.let {
                     AppDatabase(it).meetingScheduleDao().insertMeetings(meetingSchedule)
