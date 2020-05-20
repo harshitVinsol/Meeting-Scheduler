@@ -25,13 +25,14 @@ class ScheduleMeetingActivity : BaseActivity() {
     private var formattedDate = Date(Calendar.getInstance().timeInMillis)
     private var formattedStartTime = Date(Calendar.getInstance().timeInMillis)
     private var formattedEndTime = Date(Calendar.getInstance().timeInMillis)
+    private val simpleDateFormat = SimpleDateFormat("dd-M-yyyy")
+    private val simpleTimeFormat = SimpleDateFormat("hh:mm aa")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule_meeting)
 
         formattedDate = intent.getSerializableExtra(FORMATTED_TOP_BAR_DATE) as Date
-        meeting_date.text =
-            "${formattedDate.date}-${formattedDate.month + 1}-${formattedDate.year + 1900}"
+        meeting_date.text = simpleDateFormat.format(formattedDate.time).toString()
 
         button_back.setOnClickListener {
             finish()
@@ -65,7 +66,8 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal[Calendar.HOUR_OF_DAY] = hour
             cal[Calendar.MINUTE] = minute
             formattedEndTime = Date(cal.timeInMillis)
-            meeting_end_time.text = SimpleDateFormat("hh:mm aa").format(cal.time)
+            meeting_end_time.text = simpleTimeFormat.format(cal.time)
+            validateEndTime()
         }
         TimePickerDialog(
             this,
@@ -74,6 +76,7 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal.get(Calendar.MINUTE),
             false
         ).show()
+        validateEndTime()
     }
 
     /*
@@ -86,7 +89,8 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal[Calendar.HOUR_OF_DAY] = hour
             cal[Calendar.MINUTE] = minute
             formattedStartTime = Date(cal.timeInMillis)
-            meeting_start_time.text = SimpleDateFormat("hh:mm aa").format(cal.time)
+            meeting_start_time.text = simpleTimeFormat.format(cal.time)
+            validateStartTime()
         }
         TimePickerDialog(
             this,
@@ -95,7 +99,7 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal.get(Calendar.MINUTE),
             false
         ).show()
-
+        validateStartTime()
     }
 
     /*
@@ -220,7 +224,7 @@ class ScheduleMeetingActivity : BaseActivity() {
     A Boolean function that validates that end time of the meeting is after the start time of the meeting
      */
     private fun validateTime(): Boolean {
-        return if (meeting_start_time.text.toString() >= meeting_end_time.text.toString()) {
+        return if (formattedStartTime >= formattedEndTime) {
             Toast.makeText(this, R.string.inappropriate_meeting_timings, Toast.LENGTH_SHORT)
                 .show()
             false
