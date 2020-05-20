@@ -119,7 +119,7 @@ class ScheduleMeetingActivity : BaseActivity() {
                 calendar[Calendar.MONTH] = month
                 calendar[Calendar.DATE] = dayOfMonth
                 formattedDate = Date(calendar.timeInMillis)
-                textView.text = "$dayOfMonth-${month + 1}-$year"
+                textView.text = simpleDateFormat.format(formattedDate.time).toString()
             },
             calendarYear,
             calendarMonth,
