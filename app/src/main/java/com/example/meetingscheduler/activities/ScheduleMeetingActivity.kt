@@ -76,7 +76,6 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal.get(Calendar.MINUTE),
             false
         ).show()
-        validateEndTime()
     }
 
     /*
@@ -99,7 +98,6 @@ class ScheduleMeetingActivity : BaseActivity() {
             cal.get(Calendar.MINUTE),
             false
         ).show()
-        validateStartTime()
     }
 
     /*
